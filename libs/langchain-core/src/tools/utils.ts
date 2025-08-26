@@ -1,5 +1,4 @@
 import { ToolCall, ToolMessage, isDirectToolOutput } from "../messages/tool.js";
-import type { ToolOutputType } from "./types.js";
 
 /**
  * Type guard that checks if a value is a valid ToolCall object.
@@ -86,7 +85,7 @@ export class ToolInputParsingException extends Error {
  * // result is { data: "results" }
  * ```
  */
-export function formatToolOutput<TOutput extends ToolOutputType>(params: {
+export function formatToolOutput<TOutput>(params: {
   content: TOutput;
   name: string;
   artifact?: unknown;
