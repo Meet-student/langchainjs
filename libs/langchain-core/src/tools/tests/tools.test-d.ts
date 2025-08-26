@@ -81,6 +81,7 @@ describe("Tool Type Tests", () => {
     it("should handle string inputs correctly", () => {
       class StringTool extends Tool<string> {
         name = "stringTool";
+
         description = "A tool that accepts strings";
 
         async _call(input: string): Promise<string> {
@@ -119,7 +120,7 @@ describe("Tool Type Tests", () => {
   });
 
   describe("DynamicStructuredTool", () => {
-    it("should infer schema types correctly", () => {
+    it("should infer schema types correctly", async () => {
       const schema = z.object({
         query: z.string(),
         maxResults: z.number().optional(),
@@ -148,14 +149,14 @@ describe("Tool Type Tests", () => {
       ).toEqualTypeOf<Promise<string>>();
 
       // @ts-expect-error - missing required field
-      structuredTool.invoke({});
+      await structuredTool.invoke({});
 
       // @ts-expect-error - wrong field type
-      structuredTool.invoke({ query: 123 });
+      await structuredTool.invoke({ query: 123 });
 
       // extra fields are possible, though not allowed
       // we can't restrict this due to generic extends constraints in TypeScript
-      structuredTool.invoke({ query: "test", extra: "field" });
+      await structuredTool.invoke({ query: "test", extra: "field" });
     });
 
     it("should work with transform schemas", () => {
@@ -377,7 +378,9 @@ describe("Tool Type Tests", () => {
         { sum: number; product: number }
       > {
         name = "calculator";
+
         description = "Performs calculations";
+
         schema = schema;
 
         async _call(input: z.output<typeof schema>) {
@@ -452,7 +455,7 @@ describe("Tool Type Tests", () => {
   });
 
   describe("Error scenarios", () => {
-    it("should type check invalid inputs at compile time", () => {
+    it("should type check invalid inputs at compile time", async () => {
       const strictTool = tool(async (input) => input.value, {
         name: "strict",
         description: "Strict typing",
@@ -460,20 +463,20 @@ describe("Tool Type Tests", () => {
       });
 
       // Valid input
-      strictTool.invoke({ value: "test" });
+      await strictTool.invoke({ value: "test" });
 
       // @ts-expect-error - missing required field
-      strictTool.invoke({});
+      await strictTool.invoke({});
 
       // @ts-expect-error - wrong type
-      strictTool.invoke({ value: 123 });
+      await strictTool.invoke({ value: 123 });
 
       // extra fields are possible, though not allowed
       // we can't restrict this due to generic extends constraints in TypeScript
-      strictTool.invoke({ value: "test", extra: "field" });
+      await strictTool.invoke({ value: "test", extra: "field" });
 
       // @ts-expect-error - wrong input type entirely
-      strictTool.invoke("string");
+      await strictTool.invoke("string");
     });
   });
 });
