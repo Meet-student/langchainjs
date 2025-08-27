@@ -369,4 +369,13 @@ describe("ChatOpenAI", () => {
       },
     ]);
   });
+
+  test("can be constructed with reasoning_effort", async () => {
+    const model = new ChatOpenAI({
+      model: "gpt-4o-2024-08-06",
+      reasoning_effort: "low",
+    });
+
+    expect(model.reasoning).toEqual({ effort: "low" });
+  });
 });
